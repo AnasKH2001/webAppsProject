@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'status',
+        'entity_id',
     ];
 
     /**
@@ -45,4 +48,27 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Relationships
+     */
+
+    // Citizen: has many complaints
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class, 'citizen_id');
+    }
+
+    // Employee: belongs to a government entity
+    public function governmentEntity()
+    {
+        return $this->belongsTo(GovernmentEntity::class, 'entity_id');
+    }
+
+    // Any user: has many complaint history records (actions performed)
+    public function complaintHistories()
+    {
+        return $this->hasMany(ComplaintHistory::class);
+    }
+
 }

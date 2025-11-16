@@ -17,6 +17,15 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            // Role
+            $table->enum('role', ['citizen', 'employee', 'admin'])->default('citizen');
+
+            // Link to government entity (for employees)
+            $table->foreignId('entity_id')->nullable()
+                ->constrained('government_entities')
+                ->onDelete('cascade');
+
             $table->rememberToken();
             $table->timestamps();
         });
