@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Mail\OtpMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -45,5 +47,44 @@ class AuthController extends Controller
         ]);
 
     }
+
+    public function resendOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        // If already verified, no need for OTP
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'Email already verified'], 400);
+        }
+
+        // Check if current OTP is still valid
+        if ($user->otp && now()->lessThan($user->otp_expires_at)) {
+            return response()->json([
+                'message' => 'Current OTP is still valid. Please use it.',
+            ], 400);
+        }
+
+        // Generate new OTP
+        $otp = rand(100000, 999999);
+        $user->otp = $otp;
+        $user->otp_expires_at = now()->addMinutes(10);
+        $user->save();
+
+        // Send new OTP
+        Mail::to($user->email)->send(new OtpMail($otp));
+
+        return response()->json([
+            'message' => 'A new OTP has been sent to your email.',
+        ]);
+    }
+
     
 }

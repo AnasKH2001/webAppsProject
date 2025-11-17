@@ -26,3 +26,6 @@ Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::post('/register', [RegisteredUserController::class, 'store'])
     ->middleware('guest')
     ->name('register');
+
+
+Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
