@@ -24,6 +24,8 @@ class User extends Authenticatable
         'role',
         'status',
         'entity_id',
+        'otp',
+        'otp_expires_at',
     ];
 
     /**
