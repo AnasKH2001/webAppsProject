@@ -12,7 +12,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'otp'   => 'required|string',
+            'otp'   => 'required|numeric',
         ]);
 
         $user = User::where('email', $request->email)->first();
