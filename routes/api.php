@@ -4,7 +4,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Auth\RegisteredUserController;
 
 
 Route::get('/user', function (Request $request) {
@@ -20,12 +19,22 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 
-Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
-
-
-Route::post('/register', [RegisteredUserController::class, 'store'])
+Route::post('/register', [AuthController::class, 'register'])
     ->middleware('guest')
     ->name('register');
 
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('guest')
+    ->name('login');
 
-Route::post('/resend-otp', [AuthController::class, 'resendOtp']);
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->middleware('auth:sanctum')
+    ->name('logout');
+
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])
+    ->middleware('guest')
+    ->name('verify-otp');
+
+Route::post('/resend-otp', [AuthController::class, 'resendOtp'])
+    ->middleware('guest')
+    ->name('resend-otp');
