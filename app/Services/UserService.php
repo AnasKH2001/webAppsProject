@@ -20,10 +20,6 @@ class UserService
             throw new \Exception('Only admins can create employee accounts.');
         }
 
-        $data['entity_id'] = $creator->entity_id;
-
-        // $data['role'] = 'employee';
-
         return $this->userRepository->createEmployee($data);
     }
 

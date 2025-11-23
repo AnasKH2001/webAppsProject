@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GovernmentEntityController;
 
 
 Route::get('/user', function (Request $request) {
@@ -44,3 +45,6 @@ Route::post('/resend-otp', [AuthController::class, 'resendOtp'])
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/create_employee', [UserController::class, 'createEmployee']);
 });
+
+
+Route::middleware(['auth:sanctum'])->get('/entities', [GovernmentEntityController::class, 'index']);

@@ -32,10 +32,9 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (AuthenticationException $e, $request) {
-            return response()->json([
-                'message' => 'Unauthorized: You must be logged in as admin to perform this action.'
-            ], 401);
-        });
-        //
-    })->create();
+    $exceptions->render(function (AuthenticationException $e, $request) {
+        return response()->json([
+            'message' => 'Unauthorized: You must be logged in to perform this action.'
+        ], 401);
+    });
+})->create();
