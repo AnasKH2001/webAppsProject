@@ -27,6 +27,7 @@ class User extends Authenticatable
         'entity_id',
         'otp',
         'otp_expires_at',
+        'email_verified_at',
     ];
 
     /**

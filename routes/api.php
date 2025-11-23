@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
 
 Route::get('/user', function (Request $request) {
@@ -38,3 +39,8 @@ Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])
 Route::post('/resend-otp', [AuthController::class, 'resendOtp'])
     ->middleware('guest')
     ->name('resend-otp');
+
+
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::post('/create_employee', [UserController::class, 'createEmployee']);
+});
