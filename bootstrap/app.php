@@ -29,6 +29,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
 
+        $middleware->alias([
+            'citizen.complaint' => \App\Http\Middleware\CitizenComplaintAccess::class,
+            'employee.complaint' => \App\Http\Middleware\EmployeeComplaintAccess::class,
+            'admin.complaint' => \App\Http\Middleware\AdminComplaintAccess::class,
+        ]);
+
+
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {

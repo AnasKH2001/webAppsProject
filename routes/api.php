@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\GovernmentEntityController;
 
 
@@ -48,3 +49,34 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
 
 Route::middleware(['auth:sanctum'])->get('/entities', [GovernmentEntityController::class, 'index']);
+
+
+// Citizens: only their own complaints
+Route::middleware(['auth:sanctum', 'citizen.complaint'])->group(function () {
+    Route::get('/complaints/{id}', [ComplaintController::class, 'show']);
+    Route::patch('/complaints/{id}', [ComplaintController::class, 'update']);
+});
+
+// Citizens: submit and manage their own complaints
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Submit a new complaint
+    Route::post('/make_complaint', [ComplaintController::class, 'store']);
+});
+
+// Citizens: list their own complaints
+Route::middleware(['auth:sanctum'])->get('/my_complaints', [ComplaintController::class, 'index']);
+
+
+// Employees: only complaints for their entity
+Route::middleware(['auth:sanctum', 'employee.complaint'])->group(function () {
+    Route::get('/complaints/{id}', [ComplaintController::class, 'show']);
+    Route::patch('/complaints/{id}', [ComplaintController::class, 'update']);
+    Route::get('/employee_complaints', [ComplaintController::class, 'index']);
+});
+
+// Admins: all complaints
+Route::middleware(['auth:sanctum', 'admin.complaint'])->group(function () {
+    Route::get('/complaints/{id}', [ComplaintController::class, 'show']);
+    Route::patch('/complaints/{id}', [ComplaintController::class, 'update']);
+    Route::get('/complaints', [ComplaintController::class, 'index']);
+});
