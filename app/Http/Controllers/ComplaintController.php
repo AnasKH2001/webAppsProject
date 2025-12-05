@@ -86,12 +86,31 @@ class ComplaintController extends Controller
 
     public function update(Request $request, $id)
     {
-        $complaint = Complaint::findOrFail($id);
-        $status = $request->validate(['status' => 'required|string'])['status'];
+        // $complaint = Complaint::findOrFail($id);
+        $user = $request->user();
 
-        $updated = $this->service->updateStatus($complaint, $status, $request->user());
+        // Citizens can only edit their own complaint
+        if ($user->role !== 'citizen') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
 
-        return response()->json($updated);
+        // Validate input
+        $validated = $request->validate([
+            'description'  => 'nullable|string|max:1000',
+            'attachments'  => 'nullable|array',
+        ]);
+
+
+        $complaint = $this->service->updateComplaintForCitizen($id, $user->id, $validated);
+
+        if (! $complaint) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        return response()->json([
+            'message'   => 'Complaint updated successfully',
+            'complaint' => $complaint
+        ]);
     }
 
     public function showByReference(Request $request, $ref)

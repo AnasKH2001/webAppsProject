@@ -55,7 +55,7 @@ Route::middleware(['auth:sanctum'])->get('/entities', [GovernmentEntityControlle
 // Citizens: only their own complaints
 Route::middleware(['auth:sanctum', 'citizen.complaint'])->group(function () {
     Route::get('/citizen_complaint/{id}', [ComplaintController::class, 'show']);
-    Route::patch('/citizen_complaint/{id}', [ComplaintController::class, 'update']);
+    Route::post('/citizen_complaint/{id}', [ComplaintController::class, 'update']);
 });
 
 // Citizens: submit and manage their own complaints

@@ -31,18 +31,18 @@ class ComplaintObserver
     public function updated(Complaint $complaint): void
     {
         //
-        $changes = $complaint->getChanges(); // fields that changed
+        $dirty = $complaint->getChanges();      // fields being changed
         $original = $complaint->getOriginal(); // old values
 
         ComplaintHistory::create([
-            'complaint_id'     => $complaint->id,
-            'changed_by'       => Auth::id(),
-            'old_status'       => $original['status'] ?? null,
-            'new_status'       => $changes['status'] ?? $complaint->status,
-            'old_desc'         => $original['description'] ?? null,
-            'new_desc'         => $changes['description'] ?? $complaint->description,
-            'old_attachments'  => $original['attachments'] ?? [],
-            'new_attachments'  => $changes['attachments'] ?? $complaint->attachments,
+            'complaint_id'    => $complaint->id,
+            'changed_by'      => Auth::id(),
+            'old_status'      => $original['status'] ?? null,
+            'new_status'      => $dirty['status'] ?? $complaint->status,
+            'old_desc'        => $original['description'] ?? null,
+            'new_desc'        => $dirty['description'] ?? $complaint->description,
+            'old_attachments' => $original['attachments'] ?? [],
+            'new_attachments' => $dirty['attachments'] ?? $complaint->attachments,
         ]);
     }
 

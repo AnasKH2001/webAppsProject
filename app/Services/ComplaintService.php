@@ -25,6 +25,20 @@ class ComplaintService
         return $this->repository->create($data);
     }
 
+    public function updateComplaintForCitizen(int $complaintId, int $citizenId, array $data)
+    {
+        $complaint = $this->repository->findById($complaintId);
+
+        if (! $complaint || $complaint->citizen_id !== $citizenId) {
+            return null; // not authorized
+        }
+
+        // Only allow editable fields
+        $allowed = collect($data)->only(['type','location','description','attachments'])->toArray();
+
+        return $this->repository->update($complaint, $allowed);
+    }
+
     public function getComplaintByReference(string $ref, User $user): Complaint
     {
         $complaint = $this->repository->findByReference($ref);
