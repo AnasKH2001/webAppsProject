@@ -16,6 +16,11 @@ class ComplaintRepository
         return Complaint::find($id);
     }
 
+    public function findByReference(string $ref): ?Complaint
+    {
+        return Complaint::where('reference_number', $ref)->first();
+    }
+
     public function findByCitizenId(int $citizenId)
     {
         return Complaint::where('citizen_id', $citizenId)->get();

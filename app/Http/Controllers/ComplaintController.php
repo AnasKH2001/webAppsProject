@@ -81,7 +81,7 @@ class ComplaintController extends Controller
     public function show($id)
     {
         $complaint = $this->service->getComplaint($id);
-        return response()->json($complaint);
+        return response()->json($complaint->toArray());
     }
 
     public function update(Request $request, $id)
@@ -93,4 +93,16 @@ class ComplaintController extends Controller
 
         return response()->json($updated);
     }
+
+    public function showByReference(Request $request, $ref)
+    {
+        try {
+            $complaint = $this->service->getComplaintByReference($ref, $request->user());
+            return response()->json($complaint);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 403);
+        }
+    }
+
+
 }

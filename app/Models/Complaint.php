@@ -42,6 +42,17 @@ class Complaint extends Model
         return $this->belongsTo(GovernmentEntity::class, 'entity_id');
     }
 
+    public function getAttachmentsAttribute($value)
+    {
+        $files = json_decode($value, true) ?? [];
+        return array_map(fn($path) => asset('storage/' . $path), $files);
+    }
+
+    public function histories()
+    {
+        return $this->hasMany(\App\Models\ComplaintHistory::class);
+    }
+
     
     //   Boot method to auto-generate reference number
      

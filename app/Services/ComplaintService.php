@@ -25,6 +25,34 @@ class ComplaintService
         return $this->repository->create($data);
     }
 
+    public function getComplaintByReference(string $ref, User $user): Complaint
+    {
+        $complaint = $this->repository->findByReference($ref);
+
+        if (!$complaint) {
+            throw new \Exception('Complaint not found.');
+        }
+
+        if ($user->role === 'citizen') {
+            if ($complaint->citizen_id !== $user->id) {
+                throw new \Exception('Forbidden: You can only access your own complaints.');
+            }
+        } elseif ($user->role === 'employee') {
+            if ($complaint->entity_id !== $user->entity_id) {
+                throw new \Exception('Forbidden: You can only access complaints for your entity.');
+            }
+        } elseif ($user->role === 'admin') {
+            // Admins can see everything → no restriction
+                    return $complaint;
+
+        } else {
+            throw new \Exception('Forbidden: Role not allowed to access complaints.');
+        }
+
+        return $complaint;
+    }
+
+
     public function listCitizenComplaints(User $citizen)
     {
         if ($citizen->role !== 'citizen') {

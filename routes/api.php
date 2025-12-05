@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\ComplaintHistoryController;
 use App\Http\Controllers\GovernmentEntityController;
 
 
@@ -53,8 +54,8 @@ Route::middleware(['auth:sanctum'])->get('/entities', [GovernmentEntityControlle
 
 // Citizens: only their own complaints
 Route::middleware(['auth:sanctum', 'citizen.complaint'])->group(function () {
-    Route::get('/complaints/{id}', [ComplaintController::class, 'show']);
-    Route::patch('/complaints/{id}', [ComplaintController::class, 'update']);
+    Route::get('/citizen_complaint/{id}', [ComplaintController::class, 'show']);
+    Route::patch('/citizen_complaint/{id}', [ComplaintController::class, 'update']);
 });
 
 // Citizens: submit and manage their own complaints
@@ -69,14 +70,20 @@ Route::middleware(['auth:sanctum'])->get('/my_complaints', [ComplaintController:
 
 // Employees: only complaints for their entity
 Route::middleware(['auth:sanctum', 'employee.complaint'])->group(function () {
-    Route::get('/complaints/{id}', [ComplaintController::class, 'show']);
-    Route::patch('/complaints/{id}', [ComplaintController::class, 'update']);
+    Route::get('/employee_complaint/{id}', [ComplaintController::class, 'show']);
+    Route::patch('/employee_complaint/{id}', [ComplaintController::class, 'update']);
     Route::get('/employee_complaints', [ComplaintController::class, 'index']);
 });
 
 // Admins: all complaints
 Route::middleware(['auth:sanctum', 'admin.complaint'])->group(function () {
-    Route::get('/complaints/{id}', [ComplaintController::class, 'show']);
-    Route::patch('/complaints/{id}', [ComplaintController::class, 'update']);
+    Route::get('/admin_complaint/{id}', [ComplaintController::class, 'show']);
+    Route::patch('/admin_complaints/{id}', [ComplaintController::class, 'update']);
     Route::get('/complaints', [ComplaintController::class, 'index']);
 });
+
+
+Route::middleware(['auth:sanctum'])->get('/complaints/reference/{ref}', [ComplaintController::class, 'showByReference']);
+
+
+Route::middleware(['auth:sanctum'])->get('/complaints/{id}/history', [ComplaintHistoryController::class, 'history']);
