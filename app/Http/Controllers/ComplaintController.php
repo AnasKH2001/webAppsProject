@@ -15,20 +15,7 @@ class ComplaintController extends Controller
         $this->service = $service;
     }
 
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'entity_id'   => 'required|exists:government_entities,id',
-    //         'type'        => 'required|string',
-    //         'location'    => 'nullable|string',
-    //         'description' => 'nullable|string',
-    //         'attachments' => 'nullable|array',
-    //     ]);
-
-    //     $complaint = $this->service->submitComplaint($validated, $request->user());
-
-    //     return response()->json($complaint, 201);
-    // }
+    
 
     public function store(Request $request)
     {
@@ -86,11 +73,11 @@ class ComplaintController extends Controller
 
     public function update(Request $request, $id)
     {
-        // $complaint = Complaint::findOrFail($id);
+        $complaint = Complaint::findOrFail($id);
         $user = $request->user();
 
         // Citizens can only edit their own complaint
-        if ($user->role !== 'citizen') {
+        if ($user->role !== 'citizen'||$user->id!==$complaint->citizen_id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
@@ -112,6 +99,58 @@ class ComplaintController extends Controller
             'complaint' => $complaint
         ]);
     }
+
+    // public function employeeUpdate(Request $request, $id)
+    // {   
+    //     $user = $request->user();
+    //     $complaint = Complaint::findOrFail($id);
+    //     if($complaint){
+    //         if ($user->role !== 'employee'||$user->entity_id!==$complaint->entity_id) {
+    //             return response()->json(['message' => 'Forbidden'], 403);
+    //         }
+
+    //         $validated = $request->validate([
+    //             'status' => 'required|string|in:pending,in_progress,resolved,rejected',
+    //         ]);
+
+    //         $complaint->status = $validated['status'];
+    //         $complaint->save();
+
+    //         return response()->json([
+    //             'message'   => 'Status updated successfully',
+    //             'complaint' => $complaint,
+    //         ]);
+
+    //     }
+    //     else return response()->json([
+    //             'message'   => 'complaint not found',
+    //         ]);
+        
+    // }
+
+    public function employeeUpdate(Request $request, $id)
+    {
+        $user = $request->user();
+        if ($user->role !== 'employee') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|string|in:pending,in_progress,resolved,rejected',
+        ]);
+
+        try {
+            $complaint = $this->service->updateStatusByEmployee($id, $user, $validated['status']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 423);
+        }
+
+        return response()->json([
+            'message'   => 'Status updated successfully',
+            'complaint' => $complaint,
+        ]);
+    }
+
 
     public function showByReference(Request $request, $ref)
     {

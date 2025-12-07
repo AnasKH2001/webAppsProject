@@ -44,6 +44,11 @@ return new class extends Migration
             $table->enum('status', ['pending', 'in_progress', 'resolved', 'rejected'])
                   ->default('pending');
 
+            $table->unsignedBigInteger('locked_by')->nullable();   // رقم الموظف الذي حجز الشكوى
+            $table->timestamp('locked_at')->nullable();            // وقت بداية الحجز
+            $table->boolean('locked')->default(false);      // وقت انتهاء المهلة
+
+
             $table->timestamps();
         });
     }

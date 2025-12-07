@@ -19,16 +19,25 @@ class Complaint extends Model
         'attachments',
         'reference_number',
         'status',
+        'locked',
+        'locked_by',
+        'locked_at',
     ];
 
     // Cast attachments JSON to array automatically
     protected $casts = [
         'attachments' => 'array',
+        'locked'      => 'boolean',
+        'locked_at'   => 'datetime',
     ];
 
     
     //  Relationships
      
+    public function locker()
+    {
+        return $this->belongsTo(User::class, 'locked_by');
+    }
 
     // Complaint belongs to a citizen (user with role = citizen)
     public function citizen()
@@ -54,6 +63,11 @@ class Complaint extends Model
     }
 
     
+    public function isLocked(): bool
+    {
+        return $this->locked && $this->locked_by !== null;
+    }
+
     //   Boot method to auto-generate reference number
      
     protected static function boot()

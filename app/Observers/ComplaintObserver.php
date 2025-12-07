@@ -34,6 +34,16 @@ class ComplaintObserver
         $dirty = $complaint->getChanges();      // fields being changed
         $original = $complaint->getOriginal(); // old values
 
+        // Only act if one of the concerned fields changed
+        $concerned = ['status', 'description', 'attachments'];
+
+        // Intersect dirty keys with concerned fields
+        $changedFields = array_intersect(array_keys($dirty), $concerned);
+
+        if (empty($changedFields)) {
+            return; // nothing relevant changed, skip history
+        }
+
         ComplaintHistory::create([
             'complaint_id'    => $complaint->id,
             'changed_by'      => Auth::id(),

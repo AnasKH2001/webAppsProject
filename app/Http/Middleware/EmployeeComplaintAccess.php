@@ -32,7 +32,7 @@ class EmployeeComplaintAccess
 
             if (!$complaint || $complaint->entity_id !== $request->user()->entity_id) {
                 return response()->json([
-                    'message' => 'Forbidden: You can only access complaints for your entity.'
+                    'message' => 'Forbidden: complaint does not exist or is not of your entity.'
                 ], 403);
             }
         }

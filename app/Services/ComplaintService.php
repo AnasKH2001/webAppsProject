@@ -34,11 +34,13 @@ class ComplaintService
         }
 
         // Only allow editable fields
-        $allowed = collect($data)->only(['type','location','description','attachments'])->toArray();
+        $allowed = collect($data)->only(['description','attachments'])->toArray();
 
         return $this->repository->update($complaint, $allowed);
     }
 
+
+    
     public function getComplaintByReference(string $ref, User $user): Complaint
     {
         $complaint = $this->repository->findByReference($ref);
@@ -81,15 +83,37 @@ class ComplaintService
         return $this->repository->findByEntityId($entityId);
     }
 
-    public function updateStatus(Complaint $complaint, string $status, User $employee): Complaint
+    public function updateStatusByEmployee(int $id, User $employee, string $newStatus): Complaint
     {
-        if (!in_array($employee->role, ['employee','admin'])) {
-            throw new \Exception('Unauthorized: Only employees or admins can update complaints.');
+        $complaint = $this->repository->findById($id);
+
+        if($employee->entity_id!==$complaint->entity_id){
+            throw new \Exception('Complaint belongs to different entity');
+        }
+        if ($complaint->locked && $complaint->locked_by !== $employee->id) {
+            throw new \Exception('Complaint is locked by another employee');
         }
 
-        $complaint->status = $status;
-        return $this->repository->update($complaint, ['status' => $status]);
+        $data = [
+            'status' => $newStatus,
+            'locked' => true,
+            'locked_by' => $employee->id,
+            'locked_at' => now(),
+        ];
+
+        $complaint = $this->repository->update($complaint, $data);
+
+        // if (in_array($newStatus, ['resolved','rejected'])) {
+        //     $complaint = $this->repository->update($complaint, [
+        //         'locked' => false,
+        //         'locked_by' => null,
+        //         'locked_at' => null,
+        //     ]);
+        // }
+
+        return $complaint;
     }
+
 
     public function getComplaint(int $id): ?Complaint
     {

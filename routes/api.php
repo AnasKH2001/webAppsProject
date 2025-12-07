@@ -44,10 +44,10 @@ Route::post('/resend-otp', [AuthController::class, 'resendOtp'])
     ->name('resend-otp');
 
 
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/create_employee', [UserController::class, 'createEmployee']);
 });
-
+// Route::post('/create_employee', [UserController::class, 'createEmployee']);
 
 Route::middleware(['auth:sanctum'])->get('/entities', [GovernmentEntityController::class, 'index']);
 
@@ -71,7 +71,7 @@ Route::middleware(['auth:sanctum'])->get('/my_complaints', [ComplaintController:
 // Employees: only complaints for their entity
 Route::middleware(['auth:sanctum', 'employee.complaint'])->group(function () {
     Route::get('/employee_complaint/{id}', [ComplaintController::class, 'show']);
-    Route::patch('/employee_complaint/{id}', [ComplaintController::class, 'update']);
+    Route::patch('/employee_complaint/{id}', [ComplaintController::class, 'employeeUpdate']);
     Route::get('/employee_complaints', [ComplaintController::class, 'index']);
 });
 

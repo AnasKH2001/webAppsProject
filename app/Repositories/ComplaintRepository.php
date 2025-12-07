@@ -39,6 +39,10 @@ class ComplaintRepository
     public function update(Complaint $complaint, array $data): Complaint
     {
         $complaint->update($data);
+        $complaint->locked=false;
+        $complaint->locked_at=null;
+        $complaint->locked_by=null;
+        $complaint->save();
         
         return $complaint;
     }
