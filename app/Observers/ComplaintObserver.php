@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Complaint;
 use App\Models\ComplaintHistory;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\ComplaintStatusUpdated;
 
 class ComplaintObserver
 {
@@ -54,6 +55,10 @@ class ComplaintObserver
             'old_attachments' => $original['attachments'] ?? [],
             'new_attachments' => $dirty['attachments'] ?? $complaint->attachments,
         ]);
+
+        if ($complaint->wasChanged('status')) {
+            $complaint->citizen->notify(new ComplaintStatusUpdated($complaint));
+        }
     }
 
     /**
