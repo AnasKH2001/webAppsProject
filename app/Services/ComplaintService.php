@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
-use App\Repositories\ComplaintRepository;
 use App\Models\User;
 use App\Models\Complaint;
+use App\Repositories\ComplaintRepository;
+use Illuminate\Support\Facades\Mail;
 
 class ComplaintService
 {
@@ -40,6 +41,28 @@ class ComplaintService
     }
 
 
+    public function requestInformation(int $complaintId, User $employee, string $message): Complaint
+    {
+        
+        $complaint = $this->repository->findById($complaintId);
+
+        if (!$complaint) {
+            throw new \Exception('Complaint not found.');
+        }
+
+        if ($complaint->entity_id !== $employee->entity_id) {
+            throw new \Exception('Unauthorized: Complaint belongs to another entity.');
+        }
+
+        if ($complaint->locked && $complaint->locked_by !== $employee->id) {
+            throw new \Exception('This complaint is currently being processed by another employee.');
+        }
+
+        Mail::to($complaint->citizen->email)
+            ->queue(new \App\Mail\MoreInfoRequestedMail($complaint, $message));
+
+        return $complaint;
+    }
     
     public function getComplaintByReference(string $ref, User $user): Complaint
     {

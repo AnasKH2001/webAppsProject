@@ -100,34 +100,7 @@ class ComplaintController extends Controller
         ]);
     }
 
-    // public function employeeUpdate(Request $request, $id)
-    // {   
-    //     $user = $request->user();
-    //     $complaint = Complaint::findOrFail($id);
-    //     if($complaint){
-    //         if ($user->role !== 'employee'||$user->entity_id!==$complaint->entity_id) {
-    //             return response()->json(['message' => 'Forbidden'], 403);
-    //         }
-
-    //         $validated = $request->validate([
-    //             'status' => 'required|string|in:pending,in_progress,resolved,rejected',
-    //         ]);
-
-    //         $complaint->status = $validated['status'];
-    //         $complaint->save();
-
-    //         return response()->json([
-    //             'message'   => 'Status updated successfully',
-    //             'complaint' => $complaint,
-    //         ]);
-
-    //     }
-    //     else return response()->json([
-    //             'message'   => 'complaint not found',
-    //         ]);
-        
-    // }
-
+    
     public function employeeUpdate(Request $request, $id)
     {
         $user = $request->user();
@@ -151,6 +124,30 @@ class ComplaintController extends Controller
         ]);
     }
 
+    
+    public function requestInfo(Request $request, $id)
+    {
+        $user = $request->user();
+        
+        // Authorization check
+        if ($user->role !== 'employee') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $validated = $request->validate([
+            'message' => 'required|string|min:10|max:2000',
+        ]);
+
+        try {
+            $complaint = $this->service->requestInformation($id, $user, $validated['message']);
+            return response()->json([
+                'message' => 'Information request sent to citizen successfully.',
+                'complaint' => $complaint
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 423);
+        }
+    }
 
     public function showByReference(Request $request, $ref)
     {

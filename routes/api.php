@@ -73,6 +73,7 @@ Route::middleware(['auth:sanctum', 'employee.complaint'])->group(function () {
     Route::get('/employee_complaint/{id}', [ComplaintController::class, 'show']);
     Route::patch('/employee_complaint/{id}', [ComplaintController::class, 'employeeUpdate']);
     Route::get('/employee_complaints', [ComplaintController::class, 'index']);
+    Route::post('/employee_complaints/{id}/request-info', [ComplaintController::class, 'requestInfo']);
 });
 
 // Admins: all complaints
