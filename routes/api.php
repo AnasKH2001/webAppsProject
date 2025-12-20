@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ComplaintHistoryController;
 use App\Http\Controllers\GovernmentEntityController;
 
@@ -81,6 +82,8 @@ Route::middleware(['auth:sanctum', 'admin.complaint'])->group(function () {
     Route::get('/admin_complaint/{id}', [ComplaintController::class, 'show']);
     Route::patch('/admin_complaints/{id}', [ComplaintController::class, 'update']);
     Route::get('/complaints', [ComplaintController::class, 'index']);
+    Route::get('/admin/stats', [DashboardController::class, 'index']);
+    Route::get('/admin/export-stats', [DashboardController::class, 'export']);
 });
 
 

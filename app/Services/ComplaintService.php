@@ -40,6 +40,57 @@ class ComplaintService
         return $this->repository->update($complaint, $allowed);
     }
 
+    public function getGlobalStatistics()
+    {
+        $entities = $this->repository->getEntityStats();
+
+        return $entities->map(function ($entity) {
+            $total = $entity->total_count;
+            return [
+                'entity_name' => $entity->name,
+                'stats' => [
+                    'total'       => $total,
+                    'pending'     => $entity->pending_count,
+                    'resolved'    => $entity->resolved_count,
+                    'in_progress' => $entity->in_progress_count,
+                    'rejected' => $entity->rejected_count,
+                    // Calculate resolution rate safely
+                    'resolution_rate' => $total > 0 
+                        ? round(($entity->resolved_count / $total) * 100, 2) . '%' 
+                        : '0%'
+                ]
+            ];
+        });
+    }
+
+    public function getStatsCsv()
+    {
+        $stats = $this->getGlobalStatistics();
+        
+        // Open a memory stream
+        $handle = fopen('php://temp', 'r+');
+        
+        // Add CSV Headers
+        fputcsv($handle, ['Government Entity', 'Total', 'Pending', 'In Progress', 'Resolved', 'Resolution Rate']);
+
+        // Add Data Rows
+        foreach ($stats as $item) {
+            fputcsv($handle, [
+                $item['entity_name'],
+                $item['stats']['total'],
+                $item['stats']['pending'],
+                $item['stats']['in_progress'],
+                $item['stats']['resolved'],
+                $item['stats']['resolution_rate'],
+            ]);
+        }
+
+        rewind($handle);
+        $csvContent = stream_get_contents($handle);
+        fclose($handle);
+
+        return $csvContent;
+    }
 
     public function requestInformation(int $complaintId, User $employee, string $message): Complaint
     {
