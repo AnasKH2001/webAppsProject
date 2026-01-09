@@ -175,6 +175,15 @@ class ComplaintService
             'locked_at' => now(),
         ];
 
+        // if($newStatus=='in_progress'){
+        //     $data = [
+        //         'status' => $newStatus,
+        //         'locked' => true,
+        //         'locked_by' => $employee->id,
+        //         'locked_at' => now(),
+        //     ];
+        // }
+
         $complaint = $this->repository->update($complaint, $data);
 
         // if (in_array($newStatus, ['resolved','rejected'])) {
